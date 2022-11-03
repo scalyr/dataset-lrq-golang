@@ -99,9 +99,9 @@ type FacetValuesResponseValue struct {
 
 func (c *Client) DoFacetValuesRequest(ctx context.Context, name string, attribs FacetValuesRequestAttribs) ([]FacetValuesResponseValue, error) {
 	reqBody := facetValuesRequest{
-		QueryType:   "FACET_VALUES",
-		StartTime:   timeToInt64(attribs.StartTime),
-		EndTime:     timeToInt64(attribs.EndTime),
+		QueryType: "FACET_VALUES",
+		StartTime: timeToInt64(attribs.StartTime),
+		EndTime:   timeToInt64(attribs.EndTime),
 		FacetValues: facetValuesRequestOpts{
 			Name:      name,
 			Filter:    attribs.Filter,

@@ -8,12 +8,12 @@ import (
 )
 
 type PlotRequestAttribs struct {
-	StartTime         *time.Time
-	EndTime           *time.Time
-	Filter            *string
-	Slices            *uint
-	SliceWidth        *string
-	BreakdownFacet    *string
+	StartTime      *time.Time
+	EndTime        *time.Time
+	Filter         *string
+	Slices         *uint
+	SliceWidth     *string
+	BreakdownFacet *string
 }
 
 type plotRequest struct {
@@ -24,18 +24,18 @@ type plotRequest struct {
 }
 
 type plotRequestOpts struct {
-	Filter            *string `json:"filter,omitempty"`
-	Slices            *uint   `json:"slices,omitempty"`
-	SliceWidth        *string `json:"sliceWidth,omitempty"`
-	Expression        *string `json:"expression"`
-	BreakdownFacet    *string `json:"breakdownFacet,omitempty"`
-	Frequency         *string `json:"frequency"`
+	Filter         *string `json:"filter,omitempty"`
+	Slices         *uint   `json:"slices,omitempty"`
+	SliceWidth     *string `json:"sliceWidth,omitempty"`
+	Expression     *string `json:"expression"`
+	BreakdownFacet *string `json:"breakdownFacet,omitempty"`
+	Frequency      *string `json:"frequency"`
 }
 
 type PlotResponseData struct {
 	XAxis []int64 `json:"xAxis"`
 	Plots []struct {
-		Label *string    `json:"label"`
+		Label  *string   `json:"label"`
 		Values []float64 `json:"samples"`
 	} `json:"plots"`
 }
@@ -52,7 +52,7 @@ func (c *Client) DoPlotRequest(ctx context.Context, expression string, attribs P
 		QueryType: "PLOT",
 		StartTime: timeToInt64(attribs.StartTime),
 		EndTime:   timeToInt64(attribs.EndTime),
-		Plot:      plotRequestOpts{
+		Plot: plotRequestOpts{
 			Filter:         attribs.Filter,
 			Slices:         attribs.Slices,
 			SliceWidth:     attribs.SliceWidth,

@@ -28,7 +28,7 @@ func (c *Client) DoPQPlotRequest(ctx context.Context, query string, attribs PQRe
 		QueryType: "PQ",
 		StartTime: timeToInt64(attribs.StartTime),
 		EndTime:   timeToInt64(attribs.EndTime),
-		PQ:        pqRequestOpts{
+		PQ: pqRequestOpts{
 			Query:      query,
 			ResultType: "PLOT",
 		},
@@ -57,8 +57,8 @@ type PQResponseData struct {
 	Columns []struct {
 		Name string `json:"name"`
 		Type string `json:"cellType"`
-	}                       `json:"columns"`
-	Warnings []string       `json:"warnings"`
+	} `json:"columns"`
+	Warnings []string `json:"warnings"`
 }
 
 func (c *Client) DoPQTableRequest(ctx context.Context, query string, attribs PQRequestAttribs) (*PQResponseData, error) {
@@ -66,7 +66,7 @@ func (c *Client) DoPQTableRequest(ctx context.Context, query string, attribs PQR
 		QueryType: "PQ",
 		StartTime: timeToInt64(attribs.StartTime),
 		EndTime:   timeToInt64(attribs.EndTime),
-		PQ:        pqRequestOpts{
+		PQ: pqRequestOpts{
 			Query:      query,
 			ResultType: "TABLE",
 		},

@@ -79,9 +79,9 @@ func (c *Client) DoLogRequestPaginated(ctx context.Context, attribs LogRequestAt
 		StartTime: timeToInt64(attribs.StartTime),
 		EndTime:   timeToInt64(attribs.EndTime),
 		Log: logRequestOpts{
-			Filter:    attribs.Filter,
-			Limit:     attribs.Limit,
-			Cursor:    cursor,
+			Filter: attribs.Filter,
+			Limit:  attribs.Limit,
+			Cursor: cursor,
 
 			// This is needed for cursor matching later
 			Ascending: func() *bool { b := true; return &b }(),

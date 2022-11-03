@@ -33,15 +33,15 @@ type DistResponseData struct {
 	PositiveBucketWidths []float64 `json:"positiveBucketWidths"`
 	NegativeBucketWidths []float64 `json:"negativeBucketWidths"`
 
-	ZeroCount            float64   `json:"zeroCount"`
-	Mean                 float64   `json:"mean"`
-	Median               float64   `json:"median"`
-	Min                  float64   `json:"min"`
-	Max                  float64   `json:"max"`
-	P10                  float64   `json:"p10"`
-	P90                  float64   `json:"p90"`
-	P99                  float64   `json:"p99"`
-	P999                 float64   `json:"p999"`
+	ZeroCount float64 `json:"zeroCount"`
+	Mean      float64 `json:"mean"`
+	Median    float64 `json:"median"`
+	Min       float64 `json:"min"`
+	Max       float64 `json:"max"`
+	P10       float64 `json:"p10"`
+	P90       float64 `json:"p90"`
+	P99       float64 `json:"p99"`
+	P999      float64 `json:"p999"`
 }
 
 func (c *Client) DoDistRequest(ctx context.Context, attribs DistRequestAttribs) (*DistResponseData, error) {
@@ -49,7 +49,7 @@ func (c *Client) DoDistRequest(ctx context.Context, attribs DistRequestAttribs) 
 		QueryType: "DISTRIBUTION",
 		StartTime: timeToInt64(attribs.StartTime),
 		EndTime:   timeToInt64(attribs.EndTime),
-		Dist:      distRequestOpts{
+		Dist: distRequestOpts{
 			Filter: attribs.Filter,
 			Facet:  attribs.Facet,
 		},
