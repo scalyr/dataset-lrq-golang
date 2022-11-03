@@ -105,3 +105,76 @@ for _, value := range values {
         fmt.Printf("%+v\n", value)
 }
 ```
+
+### Plot request
+
+```golang
+slices := 10
+breakdownFacet := "session"
+
+plotData, err := client.DoPlotRequest(ctx, "count(tag='audit')", lrq.PlotRequestAttribs{
+        StartTime:      stringToTime("2022-11-02T12:45:00-04:00"),
+        EndTime:        stringToTime("2022-11-02T13:00:00-04:00"),
+        Slices:         &slices,
+        BreakdownFacet: &session,
+})
+if err != nil {
+        panic(err)
+}
+
+fmt.Printf("%+v\n", plotData.XAxis)
+for _, plot := range plotData.Plots {
+        fmt.Printf("%+v\n", plot)
+}
+```
+
+### PowerQuery plot request
+
+```golang
+pq := "tag='audit' | group count=count() by timestamp=timebucket('1m')"
+plotData, err := client.DoPQPlotRequest(ctx, pq, lrq.PQRequestAttribs{
+        StartTime: stringToTime("2022-11-02T12:45:00-04:00"),
+        EndTime:   stringToTime("2022-11-02T13:00:00-04:00"),
+})
+if err != nil {
+        panic(err)
+}
+
+fmt.Printf("%+v\n", plotData.XAxis)
+for _, plot := range plotData.Plots {
+        fmt.Printf("%+v\n", plot)
+}
+```
+
+### PowerQuery table request
+
+```golang
+pq := "tag='audit' | group count=count() by timestamp=timebucket('1m')"
+data, err := client.DoPQTableRequest(ctx, pq, lrq.PQRequestAttribs{
+        StartTime: stringToTime("2022-11-02T12:45:00-04:00"),
+        EndTime:   stringToTime("2022-11-02T13:00:00-04:00"),
+})
+if err != nil {
+        panic(err)
+}
+
+fmt.Printf("%+v\n", data.Columns)
+fmt.Printf("%+v\n", data.Values)
+if len(data.Warnings) > 0 {
+        fmt.Printf("%+v\n", data.Warnings)
+}
+```
+
+### Distribution request
+
+```golang
+data, err := client.DoDistRequest(ctx, lrq.DistRequestAttribs{
+        StartTime: stringToTime("2022-11-02T12:45:00-04:00"),
+        EndTime:   stringToTime("2022-11-02T13:00:00-04:00"),
+})
+if err != nil {
+        panic(err)
+}
+
+fmt.Printf("%+v\n", data)
+```
