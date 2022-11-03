@@ -43,7 +43,6 @@ for _, log := range logs {
 limit := 10
 
 var cursor *string
-var lastCursor *string
 for {
         var logs []lrq.LogResponseMatch
         var err error
@@ -61,11 +60,9 @@ for {
                 fmt.Printf("%+v\n", log)
         }
 
-        if len(logs) == 0 || cursor == nil || (lastCursor != nil && *cursor == *lastCursor) {
+        if len(logs) == 0 {
                 break
         }
-
-        lastCursor = cursor
 }
 ```
 

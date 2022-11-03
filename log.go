@@ -21,9 +21,10 @@ type logRequest struct {
 }
 
 type logRequestOpts struct {
-	Filter *string `json:"filter,omitempty"`
-	Limit  *uint   `json:"limit,omitempty"`
-	Cursor *string `json:"cursor,omitempty"`
+	Filter    *string `json:"filter,omitempty"`
+	Limit     *uint   `json:"limit,omitempty"`
+	Cursor    *string `json:"cursor,omitempty"`
+	Ascending *bool   `json:"ascending,omitempty"`
 }
 
 type logResponseMatch struct {
@@ -78,9 +79,12 @@ func (c *Client) DoLogRequestPaginated(ctx context.Context, attribs LogRequestAt
 		StartTime: timeToInt64(attribs.StartTime),
 		EndTime:   timeToInt64(attribs.EndTime),
 		Log: logRequestOpts{
-			Filter: attribs.Filter,
-			Limit:  attribs.Limit,
-			Cursor: cursor,
+			Filter:    attribs.Filter,
+			Limit:     attribs.Limit,
+			Cursor:    cursor,
+
+			// This is needed for cursor matching later
+			Ascending: func() *bool { b := true; return &b }(),
 		},
 	}
 
@@ -102,10 +106,38 @@ func (c *Client) DoLogRequestPaginated(ctx context.Context, attribs LogRequestAt
 		return nil, nil, err
 	}
 
-	matches := make([]LogResponseMatch, len(respBody.Matches))
-	for i := range respBody.Matches {
-		matches[i] = respBody.Matches[i].LogResponseMatch
-	}
+	// The cursor represents an identifier associated with a specific event.
+	// So specifying a cursor means the matches should start with that event,
+	// which here is the last event of the previous paginated results.
 
-	return matches, &respBody.Matches[0].Cursor, nil
+	if cursor == nil {
+		matches := make([]LogResponseMatch, len(respBody.Matches))
+		for i := range respBody.Matches {
+			matches[i] = respBody.Matches[i].LogResponseMatch
+		}
+
+		lastCursor := respBody.Matches[len(respBody.Matches)-1].Cursor
+		return matches, &lastCursor, nil
+	} else {
+		if len(respBody.Matches) == 0 {
+			return []LogResponseMatch{}, nil, nil
+		}
+
+		var matches []LogResponseMatch
+		firstCursor := respBody.Matches[0].Cursor
+		if firstCursor == *cursor {
+			matches = make([]LogResponseMatch, len(respBody.Matches)-1)
+			for i := range respBody.Matches[1:] {
+				matches[i] = respBody.Matches[i+1].LogResponseMatch
+			}
+		} else {
+			matches = make([]LogResponseMatch, len(respBody.Matches))
+			for i := range respBody.Matches {
+				matches[i] = respBody.Matches[i].LogResponseMatch
+			}
+		}
+
+		lastCursor := respBody.Matches[len(respBody.Matches)-1].Cursor
+		return matches, &lastCursor, nil
+	}
 }
