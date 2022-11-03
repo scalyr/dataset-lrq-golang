@@ -23,6 +23,12 @@ type logRequest struct {
 type logRequestOpts struct {
 	Filter *string `json:"filter,omitempty"`
 	Limit  *uint   `json:"limit,omitempty"`
+	Cursor *string `json:"cursor,omitempty"`
+}
+
+type logResponseMatch struct {
+	LogResponseMatch
+	Cursor string `json:"cursor"`
 }
 
 type LogResponseMatch struct {
@@ -35,15 +41,6 @@ type LogResponseMatch struct {
 }
 
 func (c *Client) DoLogRequest(ctx context.Context, attribs LogRequestAttribs) ([]LogResponseMatch, error) {
-	timeToInt64 := func(t *time.Time) *int64 {
-		if t == nil {
-			return nil
-		} else {
-			n := t.Unix()
-			return &n
-		}
-	}
-
 	reqBody := logRequest{
 		QueryType: "LOG",
 		StartTime: timeToInt64(attribs.StartTime),
@@ -75,4 +72,40 @@ func (c *Client) DoLogRequest(ctx context.Context, attribs LogRequestAttribs) ([
 	return respBody.Matches, nil
 }
 
-// FIXME Implement a paginated version
+func (c *Client) DoLogRequestPaginated(ctx context.Context, attribs LogRequestAttribs, cursor *string) ([]LogResponseMatch, *string, error) {
+	reqBody := logRequest{
+		QueryType: "LOG",
+		StartTime: timeToInt64(attribs.StartTime),
+		EndTime:   timeToInt64(attribs.EndTime),
+		Log: logRequestOpts{
+			Filter: attribs.Filter,
+			Limit:  attribs.Limit,
+			Cursor: cursor,
+		},
+	}
+
+	reqBytes, err := json.Marshal(reqBody)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	respBytes, err := c.doRequest(ctx, reqBytes)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var respBody struct {
+		Matches []logResponseMatch `json:"matches"`
+	}
+
+	if err := json.Unmarshal(respBytes, &respBody); err != nil {
+		return nil, nil, err
+	}
+
+	matches := make([]LogResponseMatch, len(respBody.Matches))
+	for i := range respBody.Matches {
+		matches[i] = respBody.Matches[i].LogResponseMatch
+	}
+
+	return matches, &respBody.Matches[0].Cursor, nil
+}
